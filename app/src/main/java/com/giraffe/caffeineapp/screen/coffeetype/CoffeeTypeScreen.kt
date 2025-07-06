@@ -44,12 +44,13 @@ import com.giraffe.caffeineapp.ui.theme.urbanist
 
 @Composable
 fun CoffeeTypeScreen(
+    navigateToCupSizeScreen: () -> Unit = {}
 ) {
-    CoffeeTypeContent()
+    CoffeeTypeContent(navigateToCupSizeScreen)
 }
 
 @Composable
-fun CoffeeTypeContent() {
+fun CoffeeTypeContent(navigateToCupSizeScreen: () -> Unit) {
     BaseScreen(
         modifier = Modifier
             .statusBarsPadding()
@@ -66,7 +67,7 @@ fun CoffeeTypeContent() {
                     .padding(top = 16.dp)
             )
         },
-        onButtonClick = {}
+        onButtonClick = navigateToCupSizeScreen
     ) {
         Column(
             modifier = Modifier

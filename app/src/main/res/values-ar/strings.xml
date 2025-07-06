@@ -8,4 +8,9 @@
     <string name="cup_of_coffee">cup of coffee</string>
     <string name="good_morning">Good Morning</string>
     <string name="what_would_you_like_to_drink_today">What would you like to drink today?</string>
+    <string name="back_arrow">back arrow</string>
+    <string name="ml">%1$d ML</string>
+    <string name="cup">cup</string>
+    <string name="coffee_bean">coffee bean</string>
+    <string name="logo">logo</string>
 </resources>
