@@ -13,4 +13,7 @@
     <string name="cup">cup</string>
     <string name="coffee_bean">coffee bean</string>
     <string name="logo">logo</string>
+    <string name="almost_done">Almost Done</string>
+    <string name="your_coffee_will_be_finish_in">Your coffee will be finish in</string>
+    <string name="loading">loading</string>
 </resources>

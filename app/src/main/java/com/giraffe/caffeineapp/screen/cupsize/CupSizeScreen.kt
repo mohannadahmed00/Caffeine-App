@@ -3,6 +3,7 @@ package com.giraffe.caffeineapp.screen.cupsize
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -38,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -48,11 +51,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.giraffe.caffeineapp.R
-import com.giraffe.caffeineapp.composable.BaseScreen
+import com.giraffe.caffeineapp.composable.DefaultButton
 import com.giraffe.caffeineapp.screen.coffeetype.CoffeeType
 import com.giraffe.caffeineapp.ui.theme.CaffeineAppTheme
 import com.giraffe.caffeineapp.ui.theme.brown
 import com.giraffe.caffeineapp.ui.theme.darkGray
+import com.giraffe.caffeineapp.ui.theme.sniglet
 import com.giraffe.caffeineapp.ui.theme.urbanist
 import com.giraffe.caffeineapp.ui.theme.white
 import org.koin.androidx.compose.koinViewModel
@@ -72,42 +76,84 @@ private fun Content(
     interaction: CupSizeScreenInteraction,
     onBackClick: () -> Unit,
 ) {
-    BaseScreen(
+    val offsetX = LocalWindowInfo.current.containerSize.width.dp
+    val animatedOffsetX =
+        animateDpAsState(if (!state.isCoffeePrepare) 0.dp else offsetX, animationSpec = tween(5000))
+    Column(
         modifier = Modifier
-            .statusBarsPadding()
             .fillMaxSize()
             .background(Color.White)
+            .statusBarsPadding()
             .verticalScroll(rememberScrollState()),
-        buttonText = stringResource(R.string.continue_txt),
-        buttonIconRes = R.drawable.right_arrow,
-        header = {
-            Header(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 16.dp),
-                onBackClick = onBackClick
-            )
-        },
-        onButtonClick = {}
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
+        Box(modifier = Modifier.weight(1f)) {
+            if (!state.isCoffeePrepare) {
+                Header(
+                    modifier = Modifier.fillMaxWidth(),
+                    onBackClick = onBackClick
+                )
+            }
+        }
         CupSection(
             modifier = Modifier
-                .padding(top = 37.dp, end = 10.dp, start = 16.dp)
-                .fillMaxWidth()
-                .weight(1f),
+                .fillMaxWidth(),
             cupSize = state.selectedSize,
             selectedPercentage = state.selectedPercentage
         )
-        SizeSelector(
-            modifier = Modifier.padding(top = 27.dp),
-            selectedSize = state.selectedSize,
-            selectSize = interaction::selectSize
+        Column(
+            modifier = Modifier.weight(2f),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (!state.isCoffeePrepare) {
+                SizeSelector(
+                    modifier = Modifier,
+                    selectedSize = state.selectedSize,
+                    selectSize = interaction::selectSize
+                )
+                PercentageSelector(
+                    modifier = Modifier.padding(top = 16.dp, bottom = 92.dp),
+                    selectedPercentage = state.selectedPercentage,
+                    selectPercentage = interaction::selectPercentage
+                )
+                DefaultButton(
+                    modifier = Modifier
+                        .padding(bottom = 50.dp),
+                    text = stringResource(R.string.continue_txt),
+                    painter = painterResource(R.drawable.right_arrow),
+                    onClick = interaction::prepareCoffee
+                )
+            } else {
+                LoadingSection(offsetX = animatedOffsetX.value)
+                AlmostSection(modifier = Modifier.padding(bottom = 50.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun LoadingSection(modifier: Modifier = Modifier, offsetX: Dp) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(50.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            modifier = Modifier
+                .fillMaxWidth(),
+            painter = painterResource(R.drawable.loading_line),
+            contentDescription = stringResource(R.string.loading),
+            contentScale = ContentScale.Crop
         )
-        PercentageSelector(
-            modifier = Modifier.padding(top = 32.dp, bottom = 92.dp),
-            selectedPercentage = state.selectedPercentage,
-            selectPercentage = interaction::selectPercentage
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .offset(x = offsetX)
+                .background(Color.White)
         )
     }
 }
@@ -125,6 +171,7 @@ private fun Header(
     ) {
         Icon(
             modifier = Modifier
+                .padding(12.dp)
                 .size(24.dp)
                 .clickable(onClick = onBackClick),
             painter = painterResource(R.drawable.arrow),
@@ -151,6 +198,8 @@ private fun CupSection(
     cupSize: CupSize = CupSize.MEDIUM,
     selectedPercentage: CoffeePercentage = CoffeePercentage.MEDIUM,
 ) {
+    val startPosition = 10.dp
+    val endPosition = -LocalWindowInfo.current.containerSize.width.dp
     val scale = animateFloatAsState(
         when (cupSize) {
             CupSize.SMALL -> .8f
@@ -158,7 +207,7 @@ private fun CupSection(
             CupSize.LARGE -> 1f
         }
     )
-    val coffeeOffsetY = remember { Animatable(50.dp, Dp.VectorConverter) }
+    val coffeeOffsetY = remember { Animatable(startPosition, Dp.VectorConverter) }
     var shotsCount by rememberSaveable { mutableIntStateOf(0) }
 
 
@@ -167,14 +216,14 @@ private fun CupSection(
             CoffeePercentage.LOW -> {
                 if (shotsCount > 1) {
                     while (shotsCount > 1) {
-                        coffeeOffsetY.snapTo(50.dp)
-                        coffeeOffsetY.animateTo((-1000).dp, animationSpec = tween(400))
+                        coffeeOffsetY.snapTo(startPosition)
+                        coffeeOffsetY.animateTo(endPosition, animationSpec = tween(600))
                         shotsCount--
                     }
                 } else {
                     while (shotsCount < 1) {
-                        coffeeOffsetY.snapTo((-1000).dp)
-                        coffeeOffsetY.animateTo(50.dp, animationSpec = tween(400))
+                        coffeeOffsetY.snapTo(endPosition)
+                        coffeeOffsetY.animateTo(startPosition, animationSpec = tween(600))
                         shotsCount++
                     }
                 }
@@ -183,15 +232,15 @@ private fun CupSection(
             CoffeePercentage.MEDIUM -> {
                 if (shotsCount > 2) {
                     while (shotsCount > 2) {
-                        coffeeOffsetY.snapTo(50.dp)
-                        coffeeOffsetY.animateTo((-1000).dp, animationSpec = tween(400))
+                        coffeeOffsetY.snapTo(startPosition)
+                        coffeeOffsetY.animateTo(endPosition, animationSpec = tween(600))
                         shotsCount--
                     }
 
                 } else {
                     while (shotsCount < 2) {
-                        coffeeOffsetY.snapTo((-1000).dp)
-                        coffeeOffsetY.animateTo(50.dp, animationSpec = tween(400))
+                        coffeeOffsetY.snapTo(endPosition)
+                        coffeeOffsetY.animateTo(startPosition, animationSpec = tween(600))
                         shotsCount++
                     }
                 }
@@ -199,18 +248,18 @@ private fun CupSection(
 
             CoffeePercentage.HIGH -> {
                 while (shotsCount < 3) {
-                    coffeeOffsetY.snapTo((-1000).dp)
-                    coffeeOffsetY.animateTo(50.dp, animationSpec = tween(400))
+                    coffeeOffsetY.snapTo(endPosition)
+                    coffeeOffsetY.animateTo(startPosition, animationSpec = tween(600))
                     shotsCount++
                 }
             }
         }
     }
-
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         Text(
             modifier = Modifier
                 .padding(vertical = 63.dp)
+                .padding(start = 16.dp)
                 .align(Alignment.TopStart),
             text = stringResource(R.string.ml, cupSize.amount),
             style = TextStyle(
@@ -224,7 +273,7 @@ private fun CupSection(
         )
         Image(
             modifier = Modifier
-                .scale(scale.value)
+                .scale(scale.value / 1.1f)
                 .offset(y = coffeeOffsetY.value)
                 .align(Alignment.TopCenter),
             painter = painterResource(R.drawable.coffee_beans),
@@ -344,10 +393,63 @@ private fun PercentageSelector(
     }
 }
 
+@Composable
+fun AlmostSection(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = stringResource(R.string.almost_done),
+            style = TextStyle(
+                color = darkGray.copy(.87f),
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.25.sp,
+                fontFamily = urbanist,
+                textAlign = TextAlign.Center
+            )
+        )
+        Text(
+            text = stringResource(R.string.your_coffee_will_be_finish_in),
+            style = TextStyle(
+                color = darkGray.copy(.6f),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.25.sp,
+                fontFamily = urbanist,
+                textAlign = TextAlign.Center
+            )
+        )
+        Text(
+            text = "CO\tFF\tEE",
+            style = TextStyle(
+                color = brown,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = 0.25.sp,
+                fontFamily = sniglet,
+                textAlign = TextAlign.Center
+            )
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun Preview() {
     CaffeineAppTheme {
-        CupSizeScreen {}
+        Content(
+            state = CoffeeSizeScreenState(
+                isCoffeePrepare = true
+            ),
+            interaction = object : CupSizeScreenInteraction {
+                override fun selectSize(size: CupSize) {}
+                override fun selectPercentage(percentage: CoffeePercentage) {}
+                override fun prepareCoffee() {}
+            },
+            onBackClick = {}
+        )
     }
 }

@@ -22,4 +22,10 @@ class CupSizeViewModel : ViewModel(), CupSizeScreenInteraction {
             _state.update { it.copy(selectedPercentage = percentage) }
         }
     }
+
+    override fun prepareCoffee() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _state.update { it.copy(isCoffeePrepare = true) }
+        }
+    }
 }

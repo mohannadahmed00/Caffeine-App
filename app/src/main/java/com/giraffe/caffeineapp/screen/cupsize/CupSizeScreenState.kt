@@ -2,7 +2,8 @@ package com.giraffe.caffeineapp.screen.cupsize
 
 data class CoffeeSizeScreenState(
     val selectedSize: CupSize = CupSize.SMALL,
-    val selectedPercentage: CoffeePercentage = CoffeePercentage.LOW
+    val selectedPercentage: CoffeePercentage = CoffeePercentage.LOW,
+    val isCoffeePrepare: Boolean = false
 )
 
 enum class CupSize(val amount: Int) {
