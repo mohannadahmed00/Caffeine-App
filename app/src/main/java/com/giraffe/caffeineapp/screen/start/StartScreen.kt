@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -56,7 +57,7 @@ private fun StartContent(
         modifier = Modifier
             .statusBarsPadding()
             .fillMaxSize()
-            .background(offWhite)
+            .background(Color.White)
             .verticalScroll(rememberScrollState()),
         buttonText = stringResource(R.string.bring_my_coffee),
         buttonIconRes = R.drawable.cup_of_coffee,

@@ -52,6 +52,8 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.koin.androidx.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.animation)
+    implementation(libs.androidx.foundation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

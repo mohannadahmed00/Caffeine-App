@@ -1,5 +1,8 @@
 package com.giraffe.caffeineapp.screen.coffeetype
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -23,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -42,20 +47,23 @@ import com.giraffe.caffeineapp.ui.theme.offWhite
 import com.giraffe.caffeineapp.ui.theme.sniglet
 import com.giraffe.caffeineapp.ui.theme.urbanist
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun CoffeeTypeScreen(
-    navigateToCupSizeScreen: () -> Unit = {}
+fun SharedTransitionScope.CoffeeTypeScreen(
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    navigateToCupSizeScreen: (coffeeName: String) -> Unit = {}
 ) {
     CoffeeTypeContent(navigateToCupSizeScreen)
 }
 
 @Composable
-fun CoffeeTypeContent(navigateToCupSizeScreen: () -> Unit) {
+fun CoffeeTypeContent(navigateToCupSizeScreen: (coffeeName: String) -> Unit) {
+    val pagerState = rememberPagerState(2) { CoffeeType.entries.size }
     BaseScreen(
         modifier = Modifier
             .statusBarsPadding()
             .fillMaxSize()
-            .background(offWhite)
+            .background(Color.White)
             .verticalScroll(rememberScrollState()),
         buttonText = stringResource(R.string.continue_txt),
         buttonIconRes = R.drawable.right_arrow,
@@ -67,7 +75,7 @@ fun CoffeeTypeContent(navigateToCupSizeScreen: () -> Unit) {
                     .padding(top = 16.dp)
             )
         },
-        onButtonClick = navigateToCupSizeScreen
+        onButtonClick = { navigateToCupSizeScreen(CoffeeType.entries[pagerState.currentPage].name.lowercase()) }
     ) {
         Column(
             modifier = Modifier
@@ -77,7 +85,8 @@ fun CoffeeTypeContent(navigateToCupSizeScreen: () -> Unit) {
         ) {
             MorningSection(modifier = Modifier.padding(horizontal = 16.dp))
             CoffeeTypesSection(
-                modifier = Modifier.height(298.dp)
+                modifier = Modifier.height(298.dp),
+                pagerState = pagerState
             )
         }
     }
@@ -124,8 +133,7 @@ fun MorningSection(modifier: Modifier = Modifier, username: String = "Hamsa") {
 }
 
 @Composable
-private fun CoffeeTypesSection(modifier: Modifier = Modifier) {
-    val pagerState = rememberPagerState(2) { CoffeeType.entries.size }
+private fun CoffeeTypesSection(modifier: Modifier = Modifier, pagerState: PagerState) {
     HorizontalPager(
         modifier = modifier,
         contentPadding = PaddingValues(horizontal = 60.dp),
@@ -176,6 +184,7 @@ private fun CoffeeTypeItem(
             )
         }
         Text(
+            modifier = Modifier,
             text = coffeeType.name.lowercase(),
             style = TextStyle(
                 color = darkGray,
@@ -195,13 +204,4 @@ enum class CoffeeType(val imageRes: Int = R.drawable.black) {
     LATTE(R.drawable.latte),
     MACCHIATO(R.drawable.macchiato),
     ESPRESSO(R.drawable.espresso),
-}
-
-
-@Preview
-@Composable
-private fun Preview() {
-    CaffeineAppTheme {
-        CoffeeTypeScreen()
-    }
 }
