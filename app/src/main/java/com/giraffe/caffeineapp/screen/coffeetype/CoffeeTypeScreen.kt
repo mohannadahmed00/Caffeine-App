@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -64,9 +65,9 @@ fun SharedTransitionScope.CoffeeTypeContent(
     val pagerState = rememberPagerState(2) { CoffeeType.entries.size }
     BaseScreen(
         modifier = Modifier
-            .statusBarsPadding()
             .fillMaxSize()
             .background(Color.White)
+            .statusBarsPadding()
             .verticalScroll(rememberScrollState()),
         buttonText = stringResource(R.string.continue_txt),
         buttonIconRes = R.drawable.right_arrow,
@@ -97,7 +98,7 @@ fun SharedTransitionScope.CoffeeTypeContent(
 }
 
 @Composable
-fun MorningSection(modifier: Modifier = Modifier, username: String = "Hamsa") {
+fun MorningSection(modifier: Modifier = Modifier, username: String = "Mohannad") {
     Column(modifier = modifier) {
         Text(
             text = stringResource(R.string.good_morning),
@@ -167,7 +168,8 @@ private fun SharedTransitionScope.CoffeeTypeItem(
     animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val animatedScale = animateFloatAsState(
-        targetValue = if (isSelected) 1f else .61f
+        targetValue = if (isSelected) 1f else .61f,
+        animationSpec = tween(500)
     )
     Column(
         modifier = modifier,

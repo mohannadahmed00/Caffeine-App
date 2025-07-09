@@ -249,13 +249,13 @@ private fun CupSection(
                 if (shotsCount > 1) {
                     while (shotsCount > 1) {
                         coffeeOffsetY.snapTo(startPosition)
-                        coffeeOffsetY.animateTo(endPosition, animationSpec = tween(600))
+                        coffeeOffsetY.animateTo(endPosition, animationSpec = tween(1000))
                         shotsCount--
                     }
                 } else {
                     while (shotsCount < 1) {
                         coffeeOffsetY.snapTo(endPosition)
-                        coffeeOffsetY.animateTo(startPosition, animationSpec = tween(600))
+                        coffeeOffsetY.animateTo(startPosition, animationSpec = tween(1000))
                         shotsCount++
                     }
                 }
@@ -265,14 +265,14 @@ private fun CupSection(
                 if (shotsCount > 2) {
                     while (shotsCount > 2) {
                         coffeeOffsetY.snapTo(startPosition)
-                        coffeeOffsetY.animateTo(endPosition, animationSpec = tween(600))
+                        coffeeOffsetY.animateTo(endPosition, animationSpec = tween(1000))
                         shotsCount--
                     }
 
                 } else {
                     while (shotsCount < 2) {
                         coffeeOffsetY.snapTo(endPosition)
-                        coffeeOffsetY.animateTo(startPosition, animationSpec = tween(600))
+                        coffeeOffsetY.animateTo(startPosition, animationSpec = tween(1000))
                         shotsCount++
                     }
                 }
@@ -281,7 +281,7 @@ private fun CupSection(
             CoffeePercentage.HIGH -> {
                 while (shotsCount < 3) {
                     coffeeOffsetY.snapTo(endPosition)
-                    coffeeOffsetY.animateTo(startPosition, animationSpec = tween(600))
+                    coffeeOffsetY.animateTo(startPosition, animationSpec = tween(1000))
                     shotsCount++
                 }
             }
