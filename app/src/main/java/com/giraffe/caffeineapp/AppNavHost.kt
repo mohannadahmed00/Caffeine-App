@@ -24,7 +24,7 @@ enum class Destination(
 ) {
     START("start"),
     COFFEE_TYPE("coffee type"),
-    CUP_SIZE("cup size/{coffee_name}"),
+    CUP_SIZE("cup_size/{coffee_name}"),
     READY("ready"),
     SNACK("snack"),
     THANK_YOU("thank_you/{snack_name}/{snack_image}"),
@@ -50,10 +50,16 @@ fun AppNavHost(
                 StartScreen(navController::navigateToCoffeeTypeScreen)
             }
             composable(Destination.COFFEE_TYPE.route) {
-                CoffeeTypeScreen(navController::navigateToCupSizeScreen)
+                CoffeeTypeScreen(this, navController::navigateToCupSizeScreen)
             }
-            composable(Destination.CUP_SIZE.route) {
+            composable(Destination.CUP_SIZE.route,arguments = listOf(
+                navArgument("coffee_name") { type = NavType.StringType },)) { backStackEntry ->
+
+                val coffeeName =
+                    backStackEntry.arguments?.getString("coffee_name") ?: "Unknown"
                 CupSizeScreen(
+                    this,
+                    coffeeName,
                     onBackClick = navController::popBackStack,
                     navigateToReadyScreen = navController::navigateToReadyScreen
                 )
@@ -65,7 +71,8 @@ fun AppNavHost(
                 SnackScreen(navController::navigateToThankYouScreen)
             }
             composable(
-                Destination.THANK_YOU.route, arguments = listOf(
+                Destination.THANK_YOU.route,
+                arguments = listOf(
                     navArgument("snack_name") { type = NavType.StringType },
                     navArgument("snack_image") { type = NavType.IntType })
             ) { backStackEntry ->
@@ -81,7 +88,7 @@ fun AppNavHost(
 fun NavHostController.navigateToCoffeeTypeScreen() = navigate(Destination.COFFEE_TYPE.route)
 fun NavHostController.navigateToCupSizeScreen(coffeeName: String) {
     val encodedName = Uri.encode(coffeeName)
-    navigate("${Destination.CUP_SIZE.route}/$encodedName")
+    navigate("cup_size/$encodedName")
 }
 
 fun NavHostController.navigateToReadyScreen() = navigate(Destination.READY.route)

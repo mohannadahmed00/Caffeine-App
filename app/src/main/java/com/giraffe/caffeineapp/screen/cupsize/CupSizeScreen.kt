@@ -1,5 +1,8 @@
 package com.giraffe.caffeineapp.screen.cupsize
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.InfiniteRepeatableSpec
@@ -49,14 +52,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.giraffe.caffeineapp.R
 import com.giraffe.caffeineapp.composable.DefaultButton
-import com.giraffe.caffeineapp.screen.coffeetype.CoffeeType
-import com.giraffe.caffeineapp.ui.theme.CaffeineAppTheme
 import com.giraffe.caffeineapp.ui.theme.brown
 import com.giraffe.caffeineapp.ui.theme.darkGray
 import com.giraffe.caffeineapp.ui.theme.sniglet
@@ -64,22 +64,28 @@ import com.giraffe.caffeineapp.ui.theme.urbanist
 import com.giraffe.caffeineapp.ui.theme.white
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun CupSizeScreen(
+fun SharedTransitionScope.CupSizeScreen(
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    coffeeName: String,
     viewModel: CupSizeViewModel = koinViewModel(),
     onBackClick: () -> Unit,
     navigateToReadyScreen: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    Content(state, viewModel, onBackClick, navigateToReadyScreen)
+    Content(state, viewModel, onBackClick, navigateToReadyScreen,animatedVisibilityScope,coffeeName)
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun Content(
+private fun SharedTransitionScope.Content(
     state: CoffeeSizeScreenState,
     interaction: CupSizeScreenInteraction,
     onBackClick: () -> Unit,
-    navigateToReadyScreen: () -> Unit
+    navigateToReadyScreen: () -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    coffeeName: String,
 ) {
     LaunchedEffect(state.isCoffeeReady) {
         if (state.isCoffeeReady) navigateToReadyScreen()
@@ -109,7 +115,9 @@ private fun Content(
             if (!state.isCoffeePrepare) {
                 Header(
                     modifier = Modifier.fillMaxWidth(),
-                    onBackClick = onBackClick
+                    onBackClick = onBackClick,
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    coffeeName = coffeeName,
                 )
             }
         }
@@ -175,11 +183,13 @@ private fun LoadingSection(modifier: Modifier = Modifier, offsetX: Dp) {
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun Header(
+private fun SharedTransitionScope.Header(
     modifier: Modifier = Modifier,
-    coffeeType: CoffeeType = CoffeeType.MACCHIATO,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    coffeeName: String,
 ) {
     Row(
         modifier = modifier,
@@ -196,7 +206,14 @@ private fun Header(
             tint = darkGray.copy(.87f)
         )
         Text(
-            text = coffeeType.name.lowercase(),
+            modifier = Modifier
+                .sharedElement(
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    sharedContentState = rememberSharedContentState(
+                        key = "text-$coffeeName"
+                    ),
+                ),
+            text = coffeeName,
             style = TextStyle(
                 color = darkGray.copy(.87f),
                 fontSize = 24.sp,
@@ -447,25 +464,6 @@ fun AlmostSection(modifier: Modifier = Modifier) {
                 fontFamily = sniglet,
                 textAlign = TextAlign.Center
             )
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun Preview() {
-    CaffeineAppTheme {
-        Content(
-            state = CoffeeSizeScreenState(
-                isCoffeePrepare = true
-            ),
-            interaction = object : CupSizeScreenInteraction {
-                override fun selectSize(size: CupSize) {}
-                override fun selectPercentage(percentage: CoffeePercentage) {}
-                override fun prepareCoffee() {}
-            },
-            onBackClick = {},
-            navigateToReadyScreen = {}
         )
     }
 }

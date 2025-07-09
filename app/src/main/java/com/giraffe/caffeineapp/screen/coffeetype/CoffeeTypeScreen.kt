@@ -43,20 +43,24 @@ import com.giraffe.caffeineapp.ui.theme.CaffeineAppTheme
 import com.giraffe.caffeineapp.ui.theme.darkGray
 import com.giraffe.caffeineapp.ui.theme.gray
 import com.giraffe.caffeineapp.ui.theme.lightGray
-import com.giraffe.caffeineapp.ui.theme.offWhite
 import com.giraffe.caffeineapp.ui.theme.sniglet
 import com.giraffe.caffeineapp.ui.theme.urbanist
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.CoffeeTypeScreen(
+    animatedVisibilityScope: AnimatedVisibilityScope,
     navigateToCupSizeScreen: (coffeeName: String) -> Unit = {}
 ) {
-    CoffeeTypeContent(navigateToCupSizeScreen)
+    CoffeeTypeContent(animatedVisibilityScope, navigateToCupSizeScreen)
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun CoffeeTypeContent(navigateToCupSizeScreen: (coffeeName: String) -> Unit) {
+fun SharedTransitionScope.CoffeeTypeContent(
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    navigateToCupSizeScreen: (coffeeName: String) -> Unit
+) {
     val pagerState = rememberPagerState(2) { CoffeeType.entries.size }
     BaseScreen(
         modifier = Modifier
@@ -85,7 +89,8 @@ fun CoffeeTypeContent(navigateToCupSizeScreen: (coffeeName: String) -> Unit) {
             MorningSection(modifier = Modifier.padding(horizontal = 16.dp))
             CoffeeTypesSection(
                 modifier = Modifier.height(298.dp),
-                pagerState = pagerState
+                pagerState = pagerState,
+                animatedVisibilityScope
             )
         }
     }
@@ -131,8 +136,13 @@ fun MorningSection(modifier: Modifier = Modifier, username: String = "Hamsa") {
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun CoffeeTypesSection(modifier: Modifier = Modifier, pagerState: PagerState) {
+private fun SharedTransitionScope.CoffeeTypesSection(
+    modifier: Modifier = Modifier,
+    pagerState: PagerState,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
     HorizontalPager(
         modifier = modifier,
         contentPadding = PaddingValues(horizontal = 60.dp),
@@ -142,16 +152,19 @@ private fun CoffeeTypesSection(modifier: Modifier = Modifier, pagerState: PagerS
         CoffeeTypeItem(
             modifier = Modifier.fillMaxWidth(),
             coffeeType = CoffeeType.entries[pageIndex],
-            isSelected = pageIndex == pagerState.currentPage
+            isSelected = pageIndex == pagerState.currentPage,
+            animatedVisibilityScope
         )
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun CoffeeTypeItem(
+private fun SharedTransitionScope.CoffeeTypeItem(
     modifier: Modifier = Modifier,
     coffeeType: CoffeeType,
-    isSelected: Boolean
+    isSelected: Boolean,
+    animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     val animatedScale = animateFloatAsState(
         targetValue = if (isSelected) 1f else .61f
@@ -183,7 +196,13 @@ private fun CoffeeTypeItem(
             )
         }
         Text(
-            modifier = Modifier,
+            modifier = Modifier
+                .sharedElement(
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    sharedContentState = rememberSharedContentState(
+                        key = "text-${coffeeType.name.lowercase()}"
+                    ),
+                ),
             text = coffeeType.name.lowercase(),
             style = TextStyle(
                 color = darkGray,
@@ -203,4 +222,13 @@ enum class CoffeeType(val imageRes: Int = R.drawable.black) {
     LATTE(R.drawable.latte),
     MACCHIATO(R.drawable.macchiato),
     ESPRESSO(R.drawable.espresso),
+}
+
+
+@Preview
+@Composable
+private fun Preview() {
+    CaffeineAppTheme {
+        //CoffeeTypeScreen()
+    }
 }
