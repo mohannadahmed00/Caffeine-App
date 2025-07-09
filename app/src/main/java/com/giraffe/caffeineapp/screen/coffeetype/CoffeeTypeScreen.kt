@@ -50,7 +50,6 @@ import com.giraffe.caffeineapp.ui.theme.urbanist
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.CoffeeTypeScreen(
-    animatedVisibilityScope: AnimatedVisibilityScope,
     navigateToCupSizeScreen: (coffeeName: String) -> Unit = {}
 ) {
     CoffeeTypeContent(navigateToCupSizeScreen)
