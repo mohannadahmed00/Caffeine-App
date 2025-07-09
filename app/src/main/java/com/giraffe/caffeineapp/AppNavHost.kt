@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.giraffe.caffeineapp.screen.coffeetype.CoffeeTypeScreen
 import com.giraffe.caffeineapp.screen.cupsize.CupSizeScreen
 import com.giraffe.caffeineapp.screen.ready.ReadyScreen
+import com.giraffe.caffeineapp.screen.snack.SnackScreen
 import com.giraffe.caffeineapp.screen.start.StartScreen
 
 enum class Destination(
@@ -18,13 +19,14 @@ enum class Destination(
     COFFEE_TYPE("coffee type"),
     CUP_SIZE("cup size"),
     READY("ready"),
+    SNACK("snack"),
 }
 
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: Destination = Destination.START,
+    startDestination: Destination = Destination.SNACK,
 ) {
     NavHost(
         modifier = modifier,
@@ -42,6 +44,7 @@ fun AppNavHost(
                     )
 
                     Destination.READY -> ReadyScreen()
+                    Destination.SNACK -> SnackScreen()
                 }
             }
         }
