@@ -90,18 +90,6 @@ private fun SharedTransitionScope.Content(
     LaunchedEffect(state.isCoffeeReady) {
         if (state.isCoffeeReady) navigateToReadyScreen()
     }
-    val offsetX = LocalWindowInfo.current.containerSize.width.dp
-    val infiniteTransition = rememberInfiniteTransition()
-    val loadingOffsetX by infiniteTransition.animateValue(
-        initialValue = 0.dp,
-        targetValue = offsetX,
-        animationSpec =
-            InfiniteRepeatableSpec(
-                animation = tween(3000),
-                repeatMode = RepeatMode.Reverse
-            ),
-        typeConverter = Dp.VectorConverter,
-    )
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -151,7 +139,7 @@ private fun SharedTransitionScope.Content(
                     onClick = interaction::prepareCoffee
                 )
             } else {
-                LoadingSection(offsetX = loadingOffsetX)
+                LoadingSection()
                 AlmostSection(modifier = Modifier.padding(bottom = 50.dp))
             }
         }
@@ -159,7 +147,19 @@ private fun SharedTransitionScope.Content(
 }
 
 @Composable
-private fun LoadingSection(modifier: Modifier = Modifier, offsetX: Dp) {
+private fun LoadingSection(modifier: Modifier = Modifier) {
+    val offsetX = LocalWindowInfo.current.containerSize.width.dp
+    val infiniteTransition = rememberInfiniteTransition()
+    val loadingOffsetX by infiniteTransition.animateValue(
+        initialValue = 0.dp,
+        targetValue = offsetX,
+        animationSpec =
+            InfiniteRepeatableSpec(
+                animation = tween(3000),
+                repeatMode = RepeatMode.Reverse
+            ),
+        typeConverter = Dp.VectorConverter,
+    )
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -177,7 +177,7 @@ private fun LoadingSection(modifier: Modifier = Modifier, offsetX: Dp) {
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .offset(x = offsetX)
+                .offset(x = loadingOffsetX)
                 .background(Color.White)
         )
     }

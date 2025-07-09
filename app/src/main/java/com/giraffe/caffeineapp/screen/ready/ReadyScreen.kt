@@ -3,6 +3,7 @@ package com.giraffe.caffeineapp.screen.ready
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -109,6 +111,7 @@ fun ReadyScreen(navigateToSnackScreen: () -> Unit) {
             modifier = Modifier
                 .padding(bottom = 47.dp)
         )
+        Spacer(Modifier.weight(1f))
         Row(
             modifier = Modifier
                 .padding(bottom = 16.dp),
@@ -155,8 +158,8 @@ private fun Cup(modifier: Modifier = Modifier) {
         )
     }
     LaunchedEffect(Unit) {
-        coverOffsetY.animateTo((-cupSize.height * .03).dp)
-        cupOffsetY.animateTo(0.dp)
+        cupOffsetY.animateTo(0.dp,animationSpec = tween(1000))
+        coverOffsetY.animateTo((-cupSize.height * .03).dp,animationSpec = tween(1000))
     }
     Box(
         modifier = modifier,

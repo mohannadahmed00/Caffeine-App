@@ -128,7 +128,7 @@ fun SharedTransitionScope.ThankYouScreen(
             Icon(
                 modifier = Modifier
                     .size(24.dp),
-                painter = painterResource(R.drawable.star),
+                painter = painterResource(R.drawable.magic_wand),
                 tint = darkGray.copy(.8f),
                 contentDescription = stringResource(R.string.coffee_bean)
             )
