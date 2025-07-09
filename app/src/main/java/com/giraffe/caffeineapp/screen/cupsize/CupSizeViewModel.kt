@@ -3,6 +3,7 @@ package com.giraffe.caffeineapp.screen.cupsize
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -26,6 +27,8 @@ class CupSizeViewModel : ViewModel(), CupSizeScreenInteraction {
     override fun prepareCoffee() {
         viewModelScope.launch(Dispatchers.IO) {
             _state.update { it.copy(isCoffeePrepare = true) }
+            delay(6000)
+            _state.update { it.copy(isCoffeeReady = true) }
         }
     }
 }

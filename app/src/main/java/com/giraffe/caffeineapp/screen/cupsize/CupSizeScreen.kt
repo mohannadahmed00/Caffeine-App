@@ -2,9 +2,12 @@ package com.giraffe.caffeineapp.screen.cupsize
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.InfiniteRepeatableSpec
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateValue
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -64,10 +67,11 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun CupSizeScreen(
     viewModel: CupSizeViewModel = koinViewModel(),
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    navigateToReadyScreen: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    Content(state, viewModel, onBackClick)
+    Content(state, viewModel, onBackClick, navigateToReadyScreen)
 }
 
 @Composable
@@ -75,10 +79,23 @@ private fun Content(
     state: CoffeeSizeScreenState,
     interaction: CupSizeScreenInteraction,
     onBackClick: () -> Unit,
+    navigateToReadyScreen: () -> Unit
 ) {
+    LaunchedEffect(state.isCoffeeReady) {
+        if (state.isCoffeeReady) navigateToReadyScreen()
+    }
     val offsetX = LocalWindowInfo.current.containerSize.width.dp
-    val animatedOffsetX =
-        animateDpAsState(if (!state.isCoffeePrepare) 0.dp else offsetX, animationSpec = tween(5000))
+    val infiniteTransition = rememberInfiniteTransition()
+    val loadingOffsetX by infiniteTransition.animateValue(
+        initialValue = 0.dp,
+        targetValue = offsetX,
+        animationSpec =
+            InfiniteRepeatableSpec(
+                animation = tween(3000),
+                repeatMode = RepeatMode.Reverse
+            ),
+        typeConverter = Dp.VectorConverter,
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -100,7 +117,7 @@ private fun Content(
             modifier = Modifier
                 .fillMaxWidth(),
             cupSize = state.selectedSize,
-            selectedPercentage = state.selectedPercentage
+            selectedPercentage = state.selectedPercentage,
         )
         Column(
             modifier = Modifier.weight(2f),
@@ -126,7 +143,7 @@ private fun Content(
                     onClick = interaction::prepareCoffee
                 )
             } else {
-                LoadingSection(offsetX = animatedOffsetX.value)
+                LoadingSection(offsetX = loadingOffsetX)
                 AlmostSection(modifier = Modifier.padding(bottom = 50.dp))
             }
         }
@@ -199,7 +216,7 @@ private fun CupSection(
     selectedPercentage: CoffeePercentage = CoffeePercentage.MEDIUM,
 ) {
     val startPosition = 10.dp
-    val endPosition = -LocalWindowInfo.current.containerSize.width.dp
+    val endPosition = -LocalWindowInfo.current.containerSize.height.dp
     val scale = animateFloatAsState(
         when (cupSize) {
             CupSize.SMALL -> .8f
@@ -209,8 +226,6 @@ private fun CupSection(
     )
     val coffeeOffsetY = remember { Animatable(startPosition, Dp.VectorConverter) }
     var shotsCount by rememberSaveable { mutableIntStateOf(0) }
-
-
     LaunchedEffect(selectedPercentage) {
         when (selectedPercentage) {
             CoffeePercentage.LOW -> {
@@ -277,7 +292,7 @@ private fun CupSection(
                 .offset(y = coffeeOffsetY.value)
                 .align(Alignment.TopCenter),
             painter = painterResource(R.drawable.coffee_beans),
-            contentDescription = stringResource(R.string.cup),
+            contentDescription = stringResource(R.string.coffee_beans),
             contentScale = ContentScale.Crop
         )
         Image(
@@ -449,7 +464,8 @@ private fun Preview() {
                 override fun selectPercentage(percentage: CoffeePercentage) {}
                 override fun prepareCoffee() {}
             },
-            onBackClick = {}
+            onBackClick = {},
+            navigateToReadyScreen = {}
         )
     }
 }

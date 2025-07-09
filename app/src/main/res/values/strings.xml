@@ -17,4 +17,11 @@
     <string name="almost_done">Almost Done</string>
     <string name="your_coffee_will_be_finish_in">Your coffee will be finish in</string>
     <string name="loading">loading</string>
+    <string name="close">close</string>
+    <string name="your_coffee_is_ready_enjoy">Your coffee is ready, Enjoy</string>
+    <string name="cup_cover">cup cover</string>
+    <string name="take_away">Take Away</string>
+    <string name="take_snack">Take snack</string>
+    <string name="foam_toggle">foam toggle</string>
+    <string name="coffee_beans">coffee beans</string>
 </resources>

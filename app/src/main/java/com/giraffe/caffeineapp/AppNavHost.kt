@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.giraffe.caffeineapp.screen.coffeetype.CoffeeTypeScreen
 import com.giraffe.caffeineapp.screen.cupsize.CupSizeScreen
+import com.giraffe.caffeineapp.screen.ready.ReadyScreen
 import com.giraffe.caffeineapp.screen.start.StartScreen
 
 enum class Destination(
@@ -16,6 +17,7 @@ enum class Destination(
     START("start"),
     COFFEE_TYPE("coffee type"),
     CUP_SIZE("cup size"),
+    READY("ready"),
 }
 
 @Composable
@@ -32,17 +34,14 @@ fun AppNavHost(
         Destination.entries.forEach { destination ->
             composable(destination.route) {
                 when (destination) {
-                    Destination.START -> StartScreen {
-                        navController.navigateToCoffeeTypeScreen()
-                    }
+                    Destination.START -> StartScreen(navController::navigateToCoffeeTypeScreen)
+                    Destination.COFFEE_TYPE -> CoffeeTypeScreen(navController::navigateToCupSizeScreen)
+                    Destination.CUP_SIZE -> CupSizeScreen(
+                        onBackClick = navController::popBackStack,
+                        navigateToReadyScreen = navController::navigateToReadyScreen
+                    )
 
-                    Destination.COFFEE_TYPE -> CoffeeTypeScreen {
-                        navController.navigateToCupSizeScreen()
-                    }
-
-                    Destination.CUP_SIZE -> CupSizeScreen {
-                        navController.popBackStack()
-                    }
+                    Destination.READY -> ReadyScreen()
                 }
             }
         }
@@ -51,3 +50,4 @@ fun AppNavHost(
 
 fun NavHostController.navigateToCoffeeTypeScreen() = navigate(Destination.COFFEE_TYPE.route)
 fun NavHostController.navigateToCupSizeScreen() = navigate(Destination.CUP_SIZE.route)
+fun NavHostController.navigateToReadyScreen() = navigate(Destination.READY.route)
