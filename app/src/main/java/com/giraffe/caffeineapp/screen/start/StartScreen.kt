@@ -3,6 +3,7 @@ package com.giraffe.caffeineapp.screen.start
 import androidx.compose.animation.core.InfiniteRepeatableSpec
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateValue
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -24,6 +25,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -55,23 +58,28 @@ private fun StartContent(
 ) {
     BaseScreen(
         modifier = Modifier
-            .statusBarsPadding()
+
             .fillMaxSize()
             .background(Color.White)
+            .statusBarsPadding()
             .verticalScroll(rememberScrollState()),
         buttonText = stringResource(R.string.bring_my_coffee),
         buttonIconRes = R.drawable.cup_of_coffee,
         onButtonClick = navigateToCoffeeTypeScreen,
-        header = { ProfileHeaderSection(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(top = 16.dp)
-        ) },
+        header = {
+            ProfileHeaderSection(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 16.dp)
+            )
+        },
     ) {
-        HocusPocusSection(modifier = Modifier
+        HocusPocusSection(
+            modifier = Modifier
                 .padding(horizontal = 58.dp)
-                .padding(top = 24.dp))
+                .padding(top = 24.dp)
+        )
         Ghost()
     }
 }
@@ -89,7 +97,19 @@ private fun Ghost() {
             ),
         typeConverter = Dp.VectorConverter,
     )
-    Column {
+    val shadowScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = .7f,
+        animationSpec =
+            InfiniteRepeatableSpec(
+                animation = tween(1000),
+                repeatMode = RepeatMode.Reverse
+            ),
+    )
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Image(
             modifier = Modifier
                 .padding(top = 13.dp)
@@ -98,23 +118,43 @@ private fun Ghost() {
             painter = painterResource(R.drawable.ghost),
             contentDescription = stringResource(R.string.ghost)
         )
+
+        Image(
+            modifier = Modifier
+                .padding(top = 0.dp)
+                .offset(y = -ghostOffsetY)
+                .scale(shadowScale),
+            painter = painterResource(R.drawable.shadow),
+            contentDescription = stringResource(R.string.ghost)
+        )
     }
 }
 
 @Composable
 private fun HocusPocusSection(modifier: Modifier = Modifier) {
+    val infiniteTransition = rememberInfiniteTransition()
+    val starAlpha by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = .2f,
+        animationSpec =
+            InfiniteRepeatableSpec(
+                animation = tween(1000),
+                repeatMode = RepeatMode.Reverse
+            ),
+    )
     Column(
         modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(5.dp)
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Image(
                 modifier = Modifier
                     .size(16.dp)
-                    .align(Alignment.Bottom),
+                    .align(Alignment.Bottom)
+                    .alpha(starAlpha),
                 painter = painterResource(R.drawable.thin_star),
                 contentDescription = stringResource(R.string.star)
             )
@@ -132,7 +172,8 @@ private fun HocusPocusSection(modifier: Modifier = Modifier) {
             )
             Image(
                 modifier = Modifier
-                    .size(16.dp),
+                    .size(16.dp)
+                    .alpha(starAlpha),
                 painter = painterResource(R.drawable.thin_star),
                 contentDescription = stringResource(R.string.star)
             )
@@ -153,7 +194,8 @@ private fun HocusPocusSection(modifier: Modifier = Modifier) {
             Image(
                 modifier = Modifier
                     .size(16.dp)
-                    .align(Alignment.End),
+                    .align(Alignment.End)
+                    .alpha(starAlpha),
                 painter = painterResource(R.drawable.thin_star),
                 contentDescription = stringResource(R.string.star)
             )
