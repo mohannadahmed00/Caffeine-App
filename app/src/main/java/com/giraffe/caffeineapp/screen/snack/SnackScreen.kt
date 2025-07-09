@@ -1,5 +1,8 @@
 package com.giraffe.caffeineapp.screen.snack
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
@@ -38,18 +41,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.giraffe.caffeineapp.R
-import com.giraffe.caffeineapp.ui.theme.CaffeineAppTheme
 import com.giraffe.caffeineapp.ui.theme.darkGray
 import com.giraffe.caffeineapp.ui.theme.urbanist
 import com.giraffe.caffeineapp.ui.theme.white
 import kotlin.math.abs
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SnackScreen(
+fun SharedTransitionScope.SnackScreen(
+    animatedVisibilityScope: AnimatedVisibilityScope,
     navigateToThankYouScreen: (Snack) -> Unit
 ) {
     val snacks by rememberSaveable {
@@ -140,15 +143,22 @@ fun SnackScreen(
                         .clickable {
                             navigateToThankYouScreen(snacks[pageIndex])
                         },
-                    snack = snacks[pageIndex], isIgnored = pagerState.currentPage > pageIndex
+                    snack = snacks[pageIndex], isIgnored = pagerState.currentPage > pageIndex,
+                    animatedVisibilityScope = animatedVisibilityScope
                 )
             }
         }
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SnackCard(modifier: Modifier = Modifier, snack: Snack, isIgnored: Boolean) {
+fun SharedTransitionScope.SnackCard(
+    modifier: Modifier = Modifier,
+    snack: Snack,
+    isIgnored: Boolean,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+) {
     val width = animateDpAsState(if (isIgnored) 200.dp else 260.41.dp)
     val height = animateDpAsState(if (isIgnored) 210.43.dp else 274.dp)
     Box(
@@ -159,6 +169,12 @@ fun SnackCard(modifier: Modifier = Modifier, snack: Snack, isIgnored: Boolean) {
             .padding(vertical = 63.dp, horizontal = 58.dp)
     ) {
         Image(
+            modifier = Modifier.sharedElement(
+                sharedContentState = rememberSharedContentState(
+                    key = "image-$${snack.image}"
+                ),
+                animatedVisibilityScope = animatedVisibilityScope,
+            ),
             painter = painterResource(snack.image),
             contentDescription = snack.name
         )
@@ -170,11 +186,3 @@ data class Snack(
     val name: String,
     val image: Int
 )
-
-@Preview
-@Composable
-private fun Preview() {
-    CaffeineAppTheme {
-        SnackCard(snack = Snack("muffin", R.drawable.muffin), isIgnored = false)
-    }
-}

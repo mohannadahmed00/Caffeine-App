@@ -1,5 +1,8 @@
 package com.giraffe.caffeineapp.screen
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,8 +37,11 @@ import com.giraffe.caffeineapp.ui.theme.brown
 import com.giraffe.caffeineapp.ui.theme.darkGray
 import com.giraffe.caffeineapp.ui.theme.urbanist
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun ThankYouScreen(snack: Snack) {
+fun SharedTransitionScope.ThankYouScreen(
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    snack: Snack) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -90,7 +96,12 @@ fun ThankYouScreen(snack: Snack) {
         Image(
             modifier = Modifier
                 .padding(horizontal = 30.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth().sharedElement(
+                    sharedContentState = rememberSharedContentState(
+                        key = "image-$${snack.image}"
+                    ),
+                    animatedVisibilityScope = animatedVisibilityScope,
+                ),
             painter = painterResource(snack.image),
             contentDescription = snack.name,
             contentScale = ContentScale.Crop

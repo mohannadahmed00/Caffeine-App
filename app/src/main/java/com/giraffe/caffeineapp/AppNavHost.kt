@@ -68,7 +68,7 @@ fun AppNavHost(
                 ReadyScreen(navController::navigateToSnackScreen)
             }
             composable(Destination.SNACK.route) {
-                SnackScreen(navController::navigateToThankYouScreen)
+                SnackScreen(this,navController::navigateToThankYouScreen)
             }
             composable(
                 Destination.THANK_YOU.route,
@@ -79,7 +79,7 @@ fun AppNavHost(
                 val snackName =
                     backStackEntry.arguments?.getString("snack_name") ?: "Unknown"
                 val snackImage = backStackEntry.arguments?.getInt("snack_image") ?: 0
-                ThankYouScreen(Snack(snackName, snackImage))
+                ThankYouScreen(this,Snack(snackName, snackImage))
             }
         }
     }
