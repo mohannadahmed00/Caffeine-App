@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,7 +49,9 @@ import com.giraffe.caffeineapp.ui.theme.white
 import kotlin.math.abs
 
 @Composable
-fun SnackScreen() {
+fun SnackScreen(
+    navigateToThankYouScreen: (Snack) -> Unit
+) {
     val snacks by rememberSaveable {
         mutableStateOf(
             listOf(
@@ -133,6 +136,9 @@ fun SnackScreen() {
                         .offset(x = offsetX)
                         .graphicsLayer {
                             rotationZ = offsetZ
+                        }
+                        .clickable {
+                            navigateToThankYouScreen(snacks[pageIndex])
                         },
                     snack = snacks[pageIndex], isIgnored = pagerState.currentPage > pageIndex
                 )

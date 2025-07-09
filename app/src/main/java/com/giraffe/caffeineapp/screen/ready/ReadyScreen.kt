@@ -58,10 +58,10 @@ import com.giraffe.caffeineapp.ui.theme.offWhite
 import com.giraffe.caffeineapp.ui.theme.urbanist
 
 @Composable
-fun ReadyScreen(modifier: Modifier = Modifier) {
+fun ReadyScreen(navigateToSnackScreen: () -> Unit) {
     var toggle by rememberSaveable { mutableStateOf(true) }
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
             .statusBarsPadding(),
@@ -132,7 +132,7 @@ fun ReadyScreen(modifier: Modifier = Modifier) {
                 .padding(bottom = 50.dp),
             text = stringResource(R.string.take_snack),
             painter = painterResource(R.drawable.right_arrow),
-            onClick = { }
+            onClick = navigateToSnackScreen
         )
     }
 }
@@ -261,6 +261,6 @@ private fun ToggleButton(
 @Composable
 private fun Preview() {
     CaffeineAppTheme {
-        ReadyScreen()
+        ReadyScreen {}
     }
 }
