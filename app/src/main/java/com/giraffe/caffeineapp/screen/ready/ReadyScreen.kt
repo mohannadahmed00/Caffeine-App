@@ -1,8 +1,12 @@
 package com.giraffe.caffeineapp.screen.ready
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -59,8 +64,13 @@ import com.giraffe.caffeineapp.ui.theme.darkGray
 import com.giraffe.caffeineapp.ui.theme.offWhite
 import com.giraffe.caffeineapp.ui.theme.urbanist
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun ReadyScreen(navigateToSnackScreen: () -> Unit) {
+fun SharedTransitionScope.ReadyScreen(
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    navigateToSnackScreen: () -> Unit,
+    onCloseClick: () -> Unit
+) {
     var toggle by rememberSaveable { mutableStateOf(true) }
     Column(
         modifier = Modifier
@@ -73,7 +83,8 @@ fun ReadyScreen(navigateToSnackScreen: () -> Unit) {
             modifier = Modifier
                 .padding(28.dp)
                 .size(24.dp)
-                .align(Alignment.Start),
+                .align(Alignment.Start)
+                .clickable(onClick = onCloseClick),
             imageVector = Icons.Rounded.Close,
             tint = darkGray.copy(.87f),
             contentDescription = stringResource(R.string.close)
@@ -108,8 +119,8 @@ fun ReadyScreen(navigateToSnackScreen: () -> Unit) {
             )
         )
         Cup(
-            modifier = Modifier
-                .padding(bottom = 47.dp)
+            modifier = Modifier.padding(bottom = 47.dp),
+            animatedVisibilityScope
         )
         Spacer(Modifier.weight(1f))
         Row(
@@ -140,8 +151,12 @@ fun ReadyScreen(navigateToSnackScreen: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun Cup(modifier: Modifier = Modifier) {
+private fun SharedTransitionScope.Cup(
+    modifier: Modifier = Modifier,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+) {
     var cupSize by remember { mutableStateOf(IntSize.Zero) }
 
     val screenHeight = LocalWindowInfo.current.containerSize.height.dp
@@ -158,16 +173,14 @@ private fun Cup(modifier: Modifier = Modifier) {
         )
     }
     LaunchedEffect(Unit) {
-        cupOffsetY.animateTo(0.dp,animationSpec = tween(1000))
-        coverOffsetY.animateTo((-cupSize.height * .03).dp,animationSpec = tween(1000))
+        cupOffsetY.animateTo(0.dp, animationSpec = tween(1000))
+        coverOffsetY.animateTo((-cupSize.height * .03).dp, animationSpec = tween(1000))
     }
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
         Box(
-            modifier = Modifier
-                .offset(y = cupOffsetY.value),
             contentAlignment = Alignment.Center
         ) {
             Image(
@@ -176,14 +189,26 @@ private fun Cup(modifier: Modifier = Modifier) {
                     .fillMaxWidth()
                     .onSizeChanged {
                         cupSize = it
-                    },
+                    }
+                    .sharedElement(
+                        sharedContentState = rememberSharedContentState(
+                            key = "image-cup"
+                        ),
+                        animatedVisibilityScope = animatedVisibilityScope,
+                    ),
                 painter = painterResource(R.drawable.empty_cup),
                 contentDescription = stringResource(R.string.cup),
                 contentScale = ContentScale.Crop
             )
             Image(
                 modifier = Modifier
-                    .size(64.dp),
+                    .size(64.dp)
+                    .sharedElement(
+                        sharedContentState = rememberSharedContentState(
+                            key = "image-logo"
+                        ),
+                        animatedVisibilityScope = animatedVisibilityScope,
+                    ),
                 painter = painterResource(R.drawable.logo),
                 contentDescription = stringResource(R.string.logo),
                 contentScale = ContentScale.Crop
@@ -257,13 +282,5 @@ private fun ToggleButton(
             painter = painterResource(R.drawable.foam),
             contentDescription = stringResource(R.string.foam_toggle)
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun Preview() {
-    CaffeineAppTheme {
-        ReadyScreen {}
     }
 }

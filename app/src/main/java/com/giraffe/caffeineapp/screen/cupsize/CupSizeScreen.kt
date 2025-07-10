@@ -74,7 +74,14 @@ fun SharedTransitionScope.CupSizeScreen(
     navigateToReadyScreen: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    Content(state, viewModel, onBackClick, navigateToReadyScreen,animatedVisibilityScope,coffeeName)
+    Content(
+        state,
+        viewModel,
+        onBackClick,
+        navigateToReadyScreen,
+        animatedVisibilityScope,
+        coffeeName
+    )
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -114,6 +121,7 @@ private fun SharedTransitionScope.Content(
                 .fillMaxWidth(),
             cupSize = state.selectedSize,
             selectedPercentage = state.selectedPercentage,
+            animatedVisibilityScope = animatedVisibilityScope
         )
         Column(
             modifier = Modifier.weight(2f),
@@ -226,11 +234,13 @@ private fun SharedTransitionScope.Header(
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun CupSection(
+private fun SharedTransitionScope.CupSection(
     modifier: Modifier = Modifier,
     cupSize: CupSize = CupSize.MEDIUM,
     selectedPercentage: CoffeePercentage = CoffeePercentage.MEDIUM,
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val startPosition = 10.dp
     val endPosition = -LocalWindowInfo.current.containerSize.height.dp
@@ -315,7 +325,13 @@ private fun CupSection(
         Image(
             modifier = Modifier
                 .fillMaxHeight()
-                .scale(scale.value),
+                .scale(scale.value)
+                .sharedElement(
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    sharedContentState = rememberSharedContentState(
+                        key = "image-cup"
+                    ),
+                ),
             painter = painterResource(R.drawable.empty_cup),
             contentDescription = stringResource(R.string.cup),
             contentScale = ContentScale.Crop
@@ -323,7 +339,13 @@ private fun CupSection(
         Image(
             modifier = Modifier
                 .size(64.dp)
-                .scale(scale.value),
+                .scale(scale.value)
+                .sharedElement(
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    sharedContentState = rememberSharedContentState(
+                        key = "image-logo"
+                    ),
+                ),
             painter = painterResource(R.drawable.logo),
             contentDescription = stringResource(R.string.logo),
             contentScale = ContentScale.Crop

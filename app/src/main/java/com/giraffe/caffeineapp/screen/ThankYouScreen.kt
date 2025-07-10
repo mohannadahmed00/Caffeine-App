@@ -5,6 +5,7 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,7 +42,9 @@ import com.giraffe.caffeineapp.ui.theme.urbanist
 @Composable
 fun SharedTransitionScope.ThankYouScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
-    snack: Snack) {
+    snack: Snack,
+    navigateToStartScreen: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -54,7 +57,8 @@ fun SharedTransitionScope.ThankYouScreen(
             modifier = Modifier
                 .padding(28.dp)
                 .size(24.dp)
-                .align(Alignment.Start),
+                .align(Alignment.Start)
+                .clickable(onClick = navigateToStartScreen),
             imageVector = Icons.Rounded.Close,
             tint = darkGray.copy(.87f),
             contentDescription = stringResource(R.string.close)
@@ -96,7 +100,8 @@ fun SharedTransitionScope.ThankYouScreen(
         Image(
             modifier = Modifier
                 .padding(horizontal = 30.dp)
-                .fillMaxWidth().sharedElement(
+                .fillMaxWidth()
+                .sharedElement(
                     sharedContentState = rememberSharedContentState(
                         key = "image-$${snack.image}"
                     ),
@@ -140,7 +145,7 @@ fun SharedTransitionScope.ThankYouScreen(
                 .align(Alignment.CenterHorizontally),
             text = stringResource(R.string.thank_youuu),
             painter = painterResource(R.drawable.right_arrow),
-            onClick = { }
+            onClick = navigateToStartScreen
         )
     }
 }

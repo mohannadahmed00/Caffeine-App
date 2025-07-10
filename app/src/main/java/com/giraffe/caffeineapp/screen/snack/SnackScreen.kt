@@ -53,7 +53,8 @@ import kotlin.math.abs
 @Composable
 fun SharedTransitionScope.SnackScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
-    navigateToThankYouScreen: (Snack) -> Unit
+    navigateToThankYouScreen: (Snack) -> Unit,
+    onCloseClick: () -> Unit
 ) {
     val snacks by rememberSaveable {
         mutableStateOf(
@@ -84,7 +85,8 @@ fun SharedTransitionScope.SnackScreen(
             modifier = Modifier
                 .padding(28.dp)
                 .size(24.dp)
-                .align(Alignment.Start),
+                .align(Alignment.Start)
+                .clickable(onClick = onCloseClick),
             imageVector = Icons.Rounded.Close,
             tint = darkGray.copy(.87f),
             contentDescription = stringResource(R.string.close)

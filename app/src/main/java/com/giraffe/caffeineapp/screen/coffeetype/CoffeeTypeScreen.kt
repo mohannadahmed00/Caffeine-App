@@ -169,7 +169,6 @@ private fun SharedTransitionScope.CoffeeTypeItem(
 ) {
     val animatedScale = animateFloatAsState(
         targetValue = if (isSelected) 1f else .61f,
-        animationSpec = tween(500)
     )
     Column(
         modifier = modifier,
